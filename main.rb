@@ -12,7 +12,7 @@ end
 class Casino
   include Validation
   CROUPIER = 'Bender'
-  START_BANK = 20
+  START_BANK = 100
   BET = 10
 
   def greeting
@@ -107,7 +107,7 @@ class Casino
       if input =~ /Да|Д|Yes|Y/i
         break
       elsif input =~ /Н(ет)?|N(o)?/i
-        puts "\nНичего, загляни к нам как будет время!"
+        puts "\nНичего, загляни к нам как будет время!\n\n"
         exit
       else
         puts "Я тебя не понимаю!"
