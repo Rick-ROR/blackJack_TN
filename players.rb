@@ -6,12 +6,11 @@ class Player
   def initialize(name, money)
     @bank = money
     @name = name
-    @cards = {}
-    @states = []
+    @cards = []
   end
 
   def get_card(card)
-    @cards[card[0]] = card[1]
+    @cards << card
   end
 
   def put_bet(money)
@@ -23,41 +22,23 @@ class Player
     @bank += money
   end
 
+  # есть похожий метод в казино
   def bankrupt?
-    if @bank.zero?
-      true
-    else
-      false
-    end
+    @bank.zero?
   end
 
   def return_cards
-    @cards = {}
+    @cards = []
   end
 
   def scoring
-    points = @cards.values.inject(:+)
-    if @cards.values.include?(11)
-      points_ace = points - 11 + 1
-      if points <= 21 && points_ace > 21
-        points
-      elsif (21 - points_ace) > (21 - points)
-        points_ace
-      else
-        points
-      end
-    else
-      points
-    end
-  end
-end
-
-class Croupier < Player
-  def choice
-    if @cards.size < 3 && scoring < 17
-      :card
-    else
-      :skip
-    end
+    # почему это не работает?
+    # card_values = @cards.inject { |sum, card | sum << card.point }
+    # card_values = @cards.reduce(0) { |sum, card | sum << card.point }
+    card_values = []
+    @cards.each { |card | card_values << card.point }
+    points = card_values.reduce(0, :+)
+    return points - 10 if card_values.include?(11) && points > 21
+    points
   end
 end

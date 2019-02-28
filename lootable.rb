@@ -3,25 +3,24 @@
 class LooTable
   attr_reader :bank
 
-
   def initialize(deck, bet, player, croupier)
     @deck = deck
     @bank = 0
     @bet = bet
-    @players = [player, croupier]
+    @player = player
+    @croupier = croupier
     start
   end
 
   def start
-    @players.each do |player|
-      card(player)
-      card(player)
-      put_bank(player)
-      puts
-    end
+    put_bank(@player)
+    put_bank(@croupier)
+    card(@player)
+    card(@croupier)
+    card(@player)
+    card(@croupier)
   end
 
-  # def skip(*); end
   def skip(player)
     puts "#{player.name} пропускает ход."
   end
@@ -50,7 +49,7 @@ class LooTable
   end
 
   def open?
-    if @players[0].cards.size == 3 && @players[1].cards.size == 3
+    if @player.cards.size == 3 && @player.cards.size == 3
       true
     else
       false
@@ -66,52 +65,52 @@ class LooTable
   end
 
   def winner?
-    player = @players[0].scoring
-    croupier = @players[1].scoring
+    player = @player.scoring
+    croupier = @croupier.scoring
 
     winner = if player == croupier
       nil
     elsif (player > 21 && croupier > 21) && (21 - player > 21 - croupier)
-      @players[0]
+      @player
     elsif player > 21 && croupier <= 21
-      @players[1]
+      @croupier
     elsif (player <= 21 && croupier > 21) || 21 - player < 21 - croupier
-      @players[0]
+      @player
     else
-      @players[1]
+      @croupier
     end
 
     if winner.nil?
-      puts "Ничья! #{@players[0].name}, похоже ты нашёл равного себе соперника!\n\n"
-      get_bank(@players)
+      puts "Ничья! #{@player.name}, похоже ты нашёл равного себе соперника!\n\n"
+      get_bank([@player, @croupier])
     else
       puts "Побежадет #{winner.name}!\n\n"
       get_bank([winner])
     end
 
-    @players.each {|plr| plr.return_cards }
+    [@player, @croupier].each {|plr| plr.return_cards }
     raise "\nКонец партии!\n\n"
   end
 
   def status(open = nil)
     player, croupier = [], []
-    @players[0].cards.each { |card, value| player << "#{card} <= #{value}" }
+    @player.cards.each { |card| player << "[#{card.value} #{card.suit}] <= #{card.point}" }
    if open.nil?
-     croupier = Array.new(@players[1].cards.size){ "[**] <= X" }
+     croupier = Array.new(@croupier.cards.size){ "[**] <= X" }
    else
-     @players[1].cards.each { |card, value| croupier << "#{card} <= #{value}" }
+     @croupier.cards.each { |card| croupier << "[#{card.value} #{card.suit}] <= #{card.point}" }
    end
     bank =  "#{@bank}$".center(5)
-    print '-' * 107 + "\n"
-    print "| %3s$ | %-33s" % [@players[0].bank, @players[0].name]
+    print "\n" + '-' * 107 + "\n"
+    print "| %3s$ | %-33s" % [@player.bank, @player.name]
     print "<%5s ( %4s ) %5s>" % ['=' * 5, bank, '=' * 5]
-    print "%33s | %3d$ |" % [@players[1].name, @players[1].bank]
+    print "%33s | %3d$ |" % [@croupier.name, @croupier.bank]
     print "\n"
 
     print "%-47s" % [player.join(', ')]
     print " <%5s%5s>" % ['=' * 5, '=' * 5]
     print "%47s " % [croupier.join(', ')]
     print "\n"
-    print '-' * 107 + "\n"
+    print '-' * 107 + "\n\n"
   end
 end
