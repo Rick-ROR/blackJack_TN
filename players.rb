@@ -32,12 +32,8 @@ class Player
   end
 
   def scoring
-    # почему это не работает?
-    # card_values = @cards..inject([]) { |sum, card | sum << card.point }
-    # card_values = @cards.reduce(0) { |sum, card | sum << card.point }
-    card_values = []
-    @cards.each { |card | card_values << card.point }
-    points = card_values.reduce(0, :+)
+    card_values = @cards.reduce([]) { |sum, card | sum << card.point }
+    points = card_values.reduce(:+)
     return points - 10 if card_values.include?(11) && points > 21
     points
   end
