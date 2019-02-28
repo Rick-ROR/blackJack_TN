@@ -6,7 +6,7 @@ require_relative 'players'
 require_relative 'croupier'
 require_relative 'validation'
 require_relative 'casino'
-require_relative 'bank'
+# require_relative 'bank'
 
 trap 'SIGINT' do
   puts 'Ctrl+C => Exiting'
