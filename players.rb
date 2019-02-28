@@ -33,7 +33,7 @@ class Player
 
   def scoring
     # почему это не работает?
-    # card_values = @cards.inject { |sum, card | sum << card.point }
+    # card_values = @cards..inject([]) { |sum, card | sum << card.point }
     # card_values = @cards.reduce(0) { |sum, card | sum << card.point }
     card_values = []
     @cards.each { |card | card_values << card.point }
