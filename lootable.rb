@@ -3,7 +3,8 @@
 class LooTable
   attr_reader :bank
 
-  def initialize(deck, bet, player, croupier)
+  def initialize(interface, deck, bet, player, croupier)
+    @interface = interface
     @deck = deck
     @bank = 0
     @bet = bet
@@ -22,11 +23,11 @@ class LooTable
   end
 
   def skip(player)
-    puts "#{player.name} пропускает ход."
+    @interface.msg_table_skip(player)
   end
 
   def put_bank(player)
-    puts "#{player.name} делает ставку #{@bet}$."
+    @interface.msg_table_put_bank(player, @bet)
     @bank += player.put_bet(@bet)
   end
 
@@ -34,22 +35,22 @@ class LooTable
     if plrs_array.size == 2
       plrs_array.each do |player|
         player.get_bank(@bank/2)
-        puts "#{player.name} забирает выигрыш в размере #{@bank/2}$."
+        @interface.msg_table_get_bank(player, @bank/2)
       end
     else
       plrs_array[0].get_bank(@bank)
-      puts "#{plrs_array[0].name} забирает выигрыш в размере #{@bank}$."
+      @interface.msg_table_get_bank(plrs_array[0], @bank)
     end
     @bank = 0
   end
 
   def card(player)
-    puts "#{player.name} добирает карту."
     player.get_card(@deck.get_card)
+    @interface.msg_table_get_card(player)
   end
 
   def open?
-    if @player.cards.size == 3 && @player.cards.size == 3
+    if @player.cards.size == 3 && @croupier.cards.size == 3
       true
     else
       false
@@ -58,17 +59,17 @@ class LooTable
 
   def open(player = nil)
     unless player.nil?
-      puts "#{player.name} решил открыть карты!"
+      @interface.msg_table_open(player)
     end
     status(true)
-    winner?
+    crediting(winner?)
   end
 
   def winner?
     player = @player.scoring
     croupier = @croupier.scoring
 
-    winner = if player == croupier
+    if player == croupier
       nil
     elsif (player > 21 && croupier > 21) && (21 - player > 21 - croupier)
       @player
@@ -79,38 +80,26 @@ class LooTable
     else
       @croupier
     end
+  end
 
+  def crediting(winner)
     if winner.nil?
-      puts "Ничья! #{@player.name}, похоже ты нашёл равного себе соперника!\n\n"
+      @interface.msg_table_crediting(winner, @player)
       get_bank([@player, @croupier])
     else
-      puts "Побежадет #{winner.name}!\n\n"
+      @interface.msg_table_crediting(winner, @player)
       get_bank([winner])
     end
 
-    [@player, @croupier].each {|plr| plr.return_cards }
-    raise "\nКонец партии!\n\n"
+    [@player, @croupier].each(&:return_cards)
+    @interface.msg_table_ending
+    raise
   end
 
-  def status(open = nil)
-    player, croupier = [], []
-    @player.cards.each { |card| player << "[#{card.value} #{card.suit}] <= #{card.point}" }
-   if open.nil?
-     croupier = Array.new(@croupier.cards.size){ "[**] <= X" }
-   else
-     @croupier.cards.each { |card| croupier << "[#{card.value} #{card.suit}] <= #{card.point}" }
-   end
-    bank =  "#{@bank}$".center(5)
-    print "\n" + '-' * 107 + "\n"
-    print "| %3s$ | %-33s" % [@player.bank, @player.name]
-    print "<%5s ( %4s ) %5s>" % ['=' * 5, bank, '=' * 5]
-    print "%33s | %3d$ |" % [@croupier.name, @croupier.bank]
-    print "\n"
-
-    print "%-47s" % [player.join(', ')]
-    print " <%5s%5s>" % ['=' * 5, '=' * 5]
-    print "%47s " % [croupier.join(', ')]
-    print "\n"
-    print '-' * 107 + "\n\n"
+  def status(open = false)
+    @interface.msg_table_status(open: open,
+                                player: @player,
+                                croupier: @croupier,
+                                bank: @bank)
   end
 end

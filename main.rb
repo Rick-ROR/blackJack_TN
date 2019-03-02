@@ -2,11 +2,11 @@
 require_relative 'lootable'
 require_relative 'deck'
 require_relative 'card'
-require_relative 'players'
+require_relative 'player'
 require_relative 'croupier'
 require_relative 'validation'
+require_relative 'interface'
 require_relative 'casino'
-# require_relative 'bank'
 
 trap 'SIGINT' do
   puts 'Ctrl+C => Exiting'
@@ -14,6 +14,5 @@ trap 'SIGINT' do
 end
 
 casino = Casino.new
-casino.greeting
 casino.new_player
 casino.start_game

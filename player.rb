@@ -32,8 +32,8 @@ class Player
   end
 
   def scoring
-    card_values = @cards.reduce([]) { |sum, card | sum << card.point }
-    points = card_values.reduce(:+)
+    card_values = @cards.map(&:point)
+    points = card_values.reduce(0, :+)
     return points - 10 if card_values.include?(11) && points > 21
     points
   end
