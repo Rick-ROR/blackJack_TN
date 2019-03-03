@@ -1,40 +1,48 @@
 #!/usr/bin/ruby -w
-# require_relative 'validation'
+
 class Interface
   include Validation
+
+  # ========================== универсальный метод ================================
+
+  MSGS = {
+    msg_greeting: "\nПриятель, рад видеть тебя на просторах нашего казино!\n\n",
+    msg_open_3cards: "\nИгроки имеют по три карты и открываются!",
+    msg_open_3round: "\n3-ий ход - открываемся!",
+    msg_balance: "Ваш баланс составляет %s.\n\n",
+    msg_bankrupt_plr: "Упс, похоже у вас закончились деньги. Мы неплохо провели время, приходите к нам ещё!\n\n",
+    msg_bankrupt_crp: "Вы отличный игрок и у %s не осталось больше денег! Заходите к нам попозже!\n\n",
+    msg_table_skip: "%s пропускает ход.",
+    msg_table_put_bank: "%s делает ставку %s$.",
+    msg_table_get_bank: "%s забирает выигрыш в размере %s$.",
+    msg_table_get_card: "%s добирает карту.",
+    msg_table_open: "%s решил открыть карты!",
+    msg_table_draw: "Ничья! %s, похоже ты нашёл равного себе соперника!\n\n",
+    msg_table_crediting: "Побежадет %s!\n\n",
+    msg_table_ending:  "\nКонец партии!\n\n"
+  }
+
+  def msg_print(symbol_msg, *subs)
+    subs.map!(&:to_s)
+    puts MSGS[symbol_msg] % subs
+  end
 
   # ========================== методы для Casino ================================
 
   def player_greeting
-    puts "\nПриятель, рад видеть тебя на просторах нашего казино!\n\n"
+    msg_print(:msg_greeting)
     loop do
       print "Представьтесь, пожалуйста:\t"
       input = gets.chomp
       next unless valid?(input, :regex)
+      puts
       break input
     end
   end
 
-  def msg_rounds
-    puts 'Игроки имеют по три карты и открываются!'
-  end
-
-  def msg_balance(player)
-    puts "Ваш баланс составляет #{player.bank}$.\n\n"
-  end
-
-  def msg_bankrupt(player)
-    if player.is_a?(Player)
-      puts "Упс, похоже у вас закончились деньги. Мы неплохо провели время, приходите к нам ещё!\n\n"
-    else
-      puts "Вы отличный игрок и у #{player.name} не осталось больше денег! Заходите к нам попозже!\n\n"
-    end
-  end
-
-
   def next_game?
     loop do
-      print "\nПриятель, начнём игру? Д/Н:\t"
+      print "Приятель, начнём игру? Д/Н:\t"
       input = gets.chomp
       next unless valid?(input, :regex)
       if input =~ /Да|Д|Yes|Y/i
@@ -74,43 +82,11 @@ class Interface
         break
       end
     end
-    puts '-' * 107
+    puts "\n" + '-' * 107 + "\n\n"
     hash_menu.key(user)
   end
 
   # ========================== методы для LooTable ================================
-
-  def msg_table_skip(player)
-    puts "#{player.name} пропускает ход."
-  end
-
-  def msg_table_put_bank(player, bet)
-    puts "#{player.name} делает ставку #{bet}$."
-  end
-
-  def msg_table_get_bank(player, winnings)
-    puts "#{player.name} забирает выигрыш в размере #{winnings}$."
-  end
-
-  def msg_table_get_card(player)
-    puts "#{player.name} добирает карту."
-  end
-
-  def msg_table_open(player)
-    puts "#{player.name} решил открыть карты!"
-  end
-
-  def msg_table_crediting(winner, player)
-    if winner.nil?
-      puts "Ничья! #{player.name}, похоже ты нашёл равного себе соперника!\n\n"
-    else
-      puts "Побежадет #{winner.name}!\n\n"
-    end
-  end
-
-  def msg_table_ending
-    puts "\nКонец партии!\n\n"
-  end
 
   def msg_table_status(args = {})
     player = args[:player]

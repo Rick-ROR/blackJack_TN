@@ -17,8 +17,7 @@ class Casino
 
   def rounds
     1.upto(3) do |i|
-      if @lootable.open?
-        @interface.msg_rounds
+      if @lootable.open?(i)
         @lootable.open
         return
       end
@@ -36,10 +35,10 @@ class Casino
 
   def bankrupt
     if @player.bankrupt?
-      @interface.msg_bankrupt(@player)
+      @interface.msg_print(:msg_bankrupt_plr)
       true
     elsif @croupier.bankrupt?
-      @interface.msg_bankrupt(@croupier)
+      @interface.msg_print(:msg_bankrupt_crp, @croupier.name)
       true
     else
       false
@@ -51,7 +50,7 @@ class Casino
     @lootable = LooTable.new(@interface, Deck.new, BET, @player, @croupier)
     rounds
   rescue RuntimeError
-    @interface.msg_balance(@player)
+    @interface.msg_print(:msg_balance, @player.name)
     return if bankrupt
     retry
   end
