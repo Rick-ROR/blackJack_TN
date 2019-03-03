@@ -39,7 +39,7 @@ class LooTable
       end
     else
       players[0].get_bank(@bank)
-      @interface.msg_print(:msg_table_get_bank, players[0].name, @bet)
+      @interface.msg_print(:msg_table_get_bank, players[0].name, @bank)
     end
     @bank = 0
   end
