@@ -2,7 +2,7 @@
 
 class Deck
   DECK = (2..10).to_a | %w{Jack Queen King ACE}
-  SUITS = %w{♤ ♡ ♢ ♧}
+  SUITS = %w{♠ ♥ ♦ ♣}
   POINTS = Hash[DECK.zip (2..10).to_a + [10, 10, 10, 11]]
 
   def initialize
