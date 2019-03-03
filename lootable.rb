@@ -31,15 +31,15 @@ class LooTable
     @bank += player.put_bet(@bet)
   end
 
-  def get_bank(plrs_array)
-    if plrs_array.size == 2
-      plrs_array.each do |player|
+  def get_bank(*players)
+    if players.size == 2
+      players.each do |player|
         player.get_bank(@bank/2)
         @interface.msg_print(:msg_table_get_bank, player.name, @bank/2)
       end
     else
-      plrs_array[0].get_bank(@bank)
-      @interface.msg_print(:msg_table_put_bank, plrs_array[0].name, @bet)
+      players[0].get_bank(@bank)
+      @interface.msg_print(:msg_table_get_bank, players[0].name, @bet)
     end
     @bank = 0
   end
@@ -89,10 +89,10 @@ class LooTable
   def crediting(winner)
     if winner.nil?
       @interface.msg_print(:msg_table_draw, @player.name)
-      get_bank([@player, @croupier])
+      get_bank(@player, @croupier)
     else
       @interface.msg_print(:msg_table_crediting, winner.name)
-      get_bank([winner])
+      get_bank(winner)
     end
 
     [@player, @croupier].each(&:return_cards)
@@ -101,9 +101,19 @@ class LooTable
   end
 
   def status(open = false)
-    @interface.msg_table_status(open: open,
-                                player: @player,
-                                croupier: @croupier,
-                                bank: @bank)
+    player_stats, croupier_stats = [], []
+    @player.cards.each { |card| player_stats << "[#{card.value} #{card.suit}] <= #{card.point}" }
+    if open
+      @croupier.cards.each { |card| croupier_stats << "[#{card.value} #{card.suit}] <= #{card.point}" }
+    else
+      croupier_stats = Array.new(@croupier.cards.size){ "[**] <= X" }
+    end
+    bank = "#{@bank}$".center(5)
+
+    @interface.msg_table_status_print(player: @player,
+                                      croupier: @croupier,
+                                      bank: bank,
+                                      player_stats: player_stats,
+                                      croupier_stats: croupier_stats)
   end
 end
